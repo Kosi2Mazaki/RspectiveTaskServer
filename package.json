@@ -4,7 +4,8 @@
   "description": "Used as test",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Test\""
+    "test": "echo \"Test\"",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
     "jsonwebtoken": "^7.4.1",
     "mongodb": "^2.2.30",
     "mongoose": "^4.11.1"
+  },
+  "engines": {
+    "node": "6.11.0"
   }
 }
