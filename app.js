@@ -63,6 +63,7 @@ app.route('/tasks')
 
 app.route('/tasks/:id')
     .get(taskController.get_task)
+    .put(taskController.update_task)
     .post(taskController.create_subtask)
     .delete(taskController.remove_task);
 

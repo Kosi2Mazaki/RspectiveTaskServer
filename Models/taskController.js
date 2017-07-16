@@ -9,9 +9,10 @@ var common = require('./common');
  * @param  {object} res response send by the server
  */
 exports.list_all_tasks = function (req, res) {
-    Task.find({ owner: req.query.user, root: true })
-        .populate('subtasks')
-        .exec(function (err, tasks) {
+    // SORT by created date and than by done to move done to bottom
+    // Task.find({ owner: req.query.user, root: true })
+    Task.find({})
+        .sort({ 'done': '1', 'created_at': '1' }).exec(function (err, tasks) {
             if (err) {
                 common.handleError("Some Internal error while listing tasks occurred", err);
             } else {
@@ -103,6 +104,35 @@ exports.create_subtask = function (req, res) {
         });
     });
 };
+
+/**
+ * Used to update a task element. As the response, the updated
+ * task is returned
+ * @param  {object} req request passed to the controller
+ * @param  {object} res response send by the server
+ */
+exports.update_task = function (req, res) {
+    console.log(req.params)
+    console.log(req.body)
+    Task.findById(req.params.id, function (err, element) {
+        if (err) {
+            common.handleError("Some Internal error while updating tasks occurred", err);
+        }
+
+        element.name = req.body.name
+        element.description = req.body.description
+        element.done = req.body.done
+
+        element.save(function (err, updatedTask) {
+            if (err) {
+                common.handleError("Some Internal error while updating tasks occurred", err);
+            } else {
+                res.send(element);
+            }
+        })
+
+    });
+}
 
 /**
  * Used to remove a root task from the database
