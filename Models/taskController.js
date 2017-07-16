@@ -9,6 +9,23 @@ var common = require('./common');
  * @param  {object} res response send by the server
  */
 exports.list_all_tasks = function (req, res) {
+    Task.find({ owner: req.query.user, root: true })
+        .populate('subtasks')
+        .exec(function (err, tasks) {
+            if (err) {
+                common.handleError("Some Internal error while listing tasks occurred", err);
+            } else {
+                res.send(tasks);
+            }
+        });
+};
+
+/**
+ * Function used to get all tasks from the database
+ * @param  {object} req request passed to the controller
+ * @param  {object} res response send by the server
+ */
+exports.list_tasks_user = function (req, res) {
     Task.find({}, function (err, tasks) {
         if (err) {
             common.handleError("Some Internal error while listing tasks occurred", err);
@@ -19,13 +36,14 @@ exports.list_all_tasks = function (req, res) {
     });
 };
 
+
 /**
  * Function used to get task from the database by its id
  * @param  {object} req request passed to the controller
  * @param  {object} res response send by the server
  */
 exports.get_task = function (req, res) {
-    Task.findById(req.params.id).
+    Task.findById(req.query.id).
         populate('subtasks')
         .exec(function (err, task) {
             if (err) {
@@ -35,14 +53,17 @@ exports.get_task = function (req, res) {
             }
         });
 };
+
 /**
  * Used to create single task without any subtasks - bes
  * @param  {object} req request passed to the controller
  * @param  {object} res response send by the server
  */
 exports.create_task = function (req, res) {
-    console.log(req.body);
-    var newTask = new Task(req.body);
+    // append info about task
+    let body = req.body
+    body['root'] = true
+    var newTask = new Task(body);
 
     newTask.save(function (err) {
         if (err) {
@@ -52,6 +73,7 @@ exports.create_task = function (req, res) {
         }
     });
 };
+
 /**
  * Used to create a subtask element. As the response, the updated
  * task is returned
@@ -63,8 +85,9 @@ exports.create_subtask = function (req, res) {
         if (err) {
             common.handleError("Some Internal error while creating a sub-tasks occurred", err);
         }
-
-        var newTask = new Task(req.body);
+        let body = req.body
+        body['root'] = false
+        var newTask = new Task(body);
         newTask.save(function (err) {
             if (err) {
                 common.handleError("Some Internal error while creating tasks occurred", err);

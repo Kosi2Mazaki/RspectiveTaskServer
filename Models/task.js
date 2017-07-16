@@ -10,10 +10,18 @@ var taskSchema = new Schema({
         required: true
     },
     description: String,
+    owner: {
+        type: String,
+        required: true
+    },
     created_at: Date,
     updated_at: {
         type: Date,
         default: Date.now
+    },
+    root :{
+        type: Boolean,
+        required: true
     },
     subtasks: [{
         'type': mongoose.Schema.Types.ObjectId,

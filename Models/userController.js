@@ -14,15 +14,25 @@ var webToken = require('jsonwebtoken');
  * @param  {object} res response send by the server
  */
 exports.create_user = function (req, res) {
-    var user = new User(req.body);
-    user.save(function (err) {
+    //check user exists
+    User.findOne({ name: req.body.name }, function (err, singleUser) {
         if (err) {
             common.handleError("An error occurred while creating a user", err, res);
+        } else if (singleUser) {
+            common.handleError("User '" + singleUser.name + "' already exists", "", res);
         } else {
-            console.log("User created");
-            res.send("User created.");
+            var user = new User(req.body);
+            user.save(function (err) {
+                if (err) {
+                    common.handleError("An error occurred while creating a user", err, res);
+                } else {
+                    console.log("User created");
+                    res.send("User created.");
+                }
+            });
         }
     });
+
 };
 
 /**
